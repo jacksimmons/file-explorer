@@ -17,34 +17,37 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="imgui\imgui.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui\imgui_demo.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui\imgui_draw.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui\imgui_tables.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui\imgui_widgets.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui\backends\imgui_impl_glfw.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui\backends\imgui_impl_opengl3.cpp">
-      <Filter>ImGui</Filter>
-    </ClCompile>
     <ClCompile Include="MenuBar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FileDisplay.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="imgui\misc\cpp\imgui_stdlib.cpp">
+    <ClCompile Include="InfoDisplay.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui\imgui.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui\imgui_demo.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui\imgui_draw.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui\imgui_tables.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui\imgui_widgets.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui\backends\imgui_impl_glfw.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui\backends\imgui_impl_opengl3.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="include\imgui\misc\cpp\imgui_stdlib.cpp">
       <Filter>ImGui</Filter>
     </ClCompile>
   </ItemGroup>
@@ -56,6 +59,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="FileDisplay.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="InfoDisplay.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

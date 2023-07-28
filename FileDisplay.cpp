@@ -4,57 +4,45 @@
 #include <iostream>
 #include <stdexcept>
 
-#include <Windows.h>
-#include <cerrno>
+#ifdef _WIN32
+#include "Windows.h"
+#endif
 
 #include "FileDisplay.hpp"
 
-namespace fs = std::filesystem;
-fs::path currentPath = fs::current_path().root_path();
-
-std::vector<std::tuple<std::string, DirectoryAccess>> directories;
-std::vector<std::tuple<std::string, uintmax_t, DirectoryAccess>> files;
-
-void DrawEnd()
+FileDisplay::FileDisplay()
 {
-	ImGui::EndTable();
-	ImGui::End();
+	m_currentPath = fs::current_path().root_path();
+	m_selectedFile = "";
 }
 
-void DrawFileDisplay(bool update)
+// Returns whether a post-update is needed
+bool FileDisplay::Draw(bool update)
 {
-	static const ImGuiWindowFlags FILE_DISP_FLAGS =
-		ImGuiWindowFlags_AlwaysVerticalScrollbar |
-		ImGuiWindowFlags_AlwaysUseWindowPadding;
-
-	static const ImGuiWindowFlags FILE_STATS_FLAGS =
-		ImGuiWindowFlags_None;
-
-	if (!ImGui::Begin("FileDisplay", nullptr, FILE_DISP_FLAGS))
+	if (!ImGui::Begin("FileDisplay", nullptr, DISP_FLAGS))
 	{
 		ImGui::End();
-		return;
+		return false;
 	}
 	
 	if (ImGui::Button("../"))
 	{
-		currentPath /= "../";
-		UpdateFiles();
+		m_currentPath /= "../";
 		ImGui::End();
-		return;
+		return true;
 	}
 
 	if (!ImGui::BeginTable("FileDisplayTable", 3))
 	{
 		ImGui::EndTable();
-		return;
+		return false;
 	}
 
 	ImGui::TableNextColumn(); ImGui::Text("Name");
 	ImGui::TableNextColumn(); ImGui::Text("File/Directory");
 	ImGui::TableNextColumn(); ImGui::Text("File Size (Bytes)");
 
-	for (auto &directory : directories)
+	for (auto &directory : m_currentDirectories)
 	{
 		std::string name = std::get<0>(directory);
 		DirectoryAccess access = std::get<1>(directory);
@@ -65,14 +53,14 @@ void DrawFileDisplay(bool update)
 
 		if (button)
 		{
-			currentPath /= name;
-			DrawEnd();
-			UpdateFiles();
-			return;
+			m_currentPath /= name;
+			ImGui::EndTable();
+			ImGui::End();
+			return true;
 		}
 	}
 
-	for (auto &file : files)
+	for (auto &file : m_currentFiles)
 	{
 		std::string name = std::get<0>(file);
 		uintmax_t fileSize = std::get<1>(file);
@@ -94,21 +82,32 @@ void DrawFileDisplay(bool update)
 		UpdateFiles();
 	}
 
-	DrawEnd();
+	ImGui::EndTable();
+	ImGui::End();
+
+	return false;
 }
 
-void UpdateFiles()
+void FileDisplay::UpdateFiles()
 {
-	directories.clear();
-	files.clear();
+	m_currentDirectories.clear();
+	m_currentFiles.clear();
 
-	for (const auto &entry : fs::directory_iterator(currentPath))
+	std::cout << m_currentPath << std::endl;
+
+	for (const auto &entry : fs::directory_iterator(m_currentPath))
 	{
 		fs::path path = entry.path();
 		bool is_dir = fs::is_directory(path);
-		std::string fname_str = utf8_encode(path.filename());
 
-		int err_state = 0;
+		std::string fname_str;
+#ifdef _WIN32
+		fname_str = utf8_encode(path.filename());
+#elif defined(linux)
+		fname_str = path.filename().string();
+#endif
+
+		bool error = false;
 		if (!is_dir)
 		{
 			uintmax_t file_size = 0;
@@ -118,26 +117,26 @@ void UpdateFiles()
 			}
 			catch (fs::filesystem_error)
 			{
-				err_state = ENOENT;
+				error = true;
 			}
 
-			if (err_state == 0)
+			if (!error)
 			{
-				files.push_back(std::make_tuple(fname_str, file_size, DirectoryAccess_Granted));
+				m_currentFiles.push_back(std::make_tuple(fname_str, file_size, DirectoryAccess_Granted));
 			}
 			else
 			{
-				files.push_back(std::make_tuple(fname_str, file_size, DirectoryAccess_DirNotFound));
+				m_currentFiles.push_back(std::make_tuple(fname_str, file_size, DirectoryAccess_DirNotFound));
 			}
 		}
 		else
 		{
-			directories.push_back(std::make_tuple(fname_str, DirectoryAccess_Granted));
+			m_currentDirectories.push_back(std::make_tuple(fname_str, DirectoryAccess_Granted));
 		}
 	}
 }
 
-ImVec4 GetTextColourFromAccess(DirectoryAccess access)
+ImVec4 FileDisplay::GetTextColourFromAccess(DirectoryAccess access)
 {
 	ImVec4 colour;
 	switch (access)
@@ -158,7 +157,7 @@ ImVec4 GetTextColourFromAccess(DirectoryAccess access)
 	return colour;
 }
 
-std::tuple<std::string, float> GetFileSizeDenom(uintmax_t fileSizeBytes)
+std::tuple<std::string, float> FileDisplay::GetFileSizeDenom(uintmax_t fileSizeBytes)
 {
 	std::string denoms[] = { "B", "KB", "MB", "GB", "TB" };
 	int denomIndex = 0;
@@ -174,10 +173,20 @@ std::tuple<std::string, float> GetFileSizeDenom(uintmax_t fileSizeBytes)
 }
 
 // From: https://stackoverflow.com/questions/215963/how-do-you-properly-use-widechartomultibyte
-std::string utf8_encode(const std::wstring &wstring)
+std::string FileDisplay::utf8_encode(const std::wstring &wstring)
 {
 	int size = WideCharToMultiByte(CP_UTF8, 0, &wstring[0], (int)wstring.size(), NULL, 0, NULL, NULL);
 	std::string string(size, 0);
 	WideCharToMultiByte(CP_UTF8, 0, &wstring[0], (int)wstring.size(), &string[0], size, NULL, NULL);
 	return string;
+}
+
+fs::path FileDisplay::currentPath()
+{
+	return m_currentPath;
+}
+
+std::string FileDisplay::selectedFile()
+{
+	return m_selectedFile;
 }

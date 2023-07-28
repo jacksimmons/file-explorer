@@ -1,9 +1,11 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <memory>
 
 #include "ImGuiInclude.hpp"
 #include "MenuBar.hpp"
 #include "FileDisplay.hpp"
+#include "InfoDisplay.hpp"
 
 ImGuiWindowFlags DOCKER_FLAGS =
 ImGuiWindowFlags_NoResize |
@@ -38,11 +40,18 @@ int main(int argc, char **argv)
 
 	ImGui::StyleColorsDark();
 
+
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
 
 	double prevUpdate = -INFINITY;
 	double now;
-	UpdateFiles();
+
+	auto fileDisplay = std::make_unique<FileDisplay>();
+	auto infoDisplay = std::make_unique<InfoDisplay>();
+	fileDisplay->UpdateFiles();
+
+	bool update = false;
 	while (!glfwWindowShouldClose(window))
 	{
 		now = glfwGetTime();
@@ -67,12 +76,14 @@ int main(int argc, char **argv)
 
 			if (now - prevUpdate > 1)
 			{
-				DrawFileDisplay(true);
+				update = fileDisplay->Draw(true);
+				infoDisplay->Draw(true, fileDisplay->currentPath(), fileDisplay->selectedFile());
 				prevUpdate = now;
 			}
 			else
 			{
-				DrawFileDisplay(false);
+				update = fileDisplay->Draw(update);
+				infoDisplay->Draw(update);
 			}
 
 			ImGui::End();

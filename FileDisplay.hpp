@@ -1,6 +1,13 @@
+#pragma once
+
+#include <vector>
 #include <tuple>
 #include <string>
+#include <filesystem>
+
 #include "ImGuiInclude.hpp"
+
+namespace fs = std::filesystem;
 
 // Access-based colours
 constexpr ImVec4 ACCESS_COLOUR =
@@ -19,13 +26,23 @@ enum DirectoryAccess
 	DirectoryAccess_DirNotFound
 };
 
-void DrawFileDisplay(bool update);
-void UpdateFiles();
+class FileDisplay {
+private:
+	std::vector<std::tuple<std::string, DirectoryAccess>> m_currentDirectories;
+	std::vector<std::tuple<std::string, uintmax_t, DirectoryAccess>> m_currentFiles;
+	fs::path m_currentPath;
+	std::string m_selectedFile;
+public:
+	FileDisplay();
+	bool Draw(bool update);
+	void UpdateFiles();
+	ImVec4 GetTextColourFromAccess(DirectoryAccess access);
+	std::tuple<std::string, float> GetFileSizeDenom(uintmax_t fileSizeBytes);
+	
+	fs::path currentPath();
+	std::string selectedFile();
 
-// Returns one of the access colours based on provided DirectoryAccess enum.
-ImVec4 GetTextColourFromAccess(DirectoryAccess access);
-
-// Gets the lowest denominator (B, KB, MB, etc...) that fileSizeBytes fits into less than 1000 times.
-std::tuple<std::string, float> GetFileSizeDenom(uintmax_t fileSizeBytes);
-
-std::string utf8_encode(const std::wstring &wstring);
+#ifdef _WIN32
+	std::string utf8_encode(const std::wstring &wstring);
+#endif
+};

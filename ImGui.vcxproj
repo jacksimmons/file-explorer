@@ -104,7 +104,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)imgui\backends;$(ProjectDir)imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;$(ProjectDir)include\imgui\backends;$(ProjectDir)include\imgui;$(ProjectDir)include\magic_enum\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -132,19 +132,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="imgui\misc\cpp\imgui_stdlib.cpp" />
+    <ClCompile Include="include\imgui\backends\imgui_impl_glfw.cpp" />
+    <ClCompile Include="include\imgui\backends\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="include\imgui\imgui.cpp" />
+    <ClCompile Include="include\imgui\imgui_demo.cpp" />
+    <ClCompile Include="include\imgui\imgui_draw.cpp" />
+    <ClCompile Include="include\imgui\imgui_tables.cpp" />
+    <ClCompile Include="include\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="include\imgui\misc\cpp\imgui_stdlib.cpp" />
+    <ClCompile Include="InfoDisplay.cpp" />
     <ClCompile Include="MenuBar.cpp" />
     <ClCompile Include="FileDisplay.cpp" />
-    <ClCompile Include="imgui\backends\imgui_impl_glfw.cpp" />
-    <ClCompile Include="imgui\backends\imgui_impl_opengl3.cpp" />
-    <ClCompile Include="imgui\imgui.cpp" />
-    <ClCompile Include="imgui\imgui_demo.cpp" />
-    <ClCompile Include="imgui\imgui_draw.cpp" />
-    <ClCompile Include="imgui\imgui_tables.cpp" />
-    <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="InfoDisplay.hpp" />
     <ClInclude Include="MenuBar.hpp" />
     <ClInclude Include="FileDisplay.hpp" />
     <ClInclude Include="ImGuiInclude.hpp" />
