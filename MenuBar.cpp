@@ -2,7 +2,7 @@
 
 void DrawAltMenuBar()
 {
-	if (ImGui::BeginMenuBar())
+	if (ImGui::BeginMainMenuBar())
 	{
 		if (ImGui::BeginMenu("File"))
 		{
@@ -12,6 +12,6 @@ void DrawAltMenuBar()
 		{
 			ImGui::EndMenu();
 		}
-		ImGui::EndMenuBar();
 	}
+	ImGui::EndMainMenuBar();
 }

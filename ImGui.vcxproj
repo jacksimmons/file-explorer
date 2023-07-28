@@ -134,7 +134,7 @@
   <ItemGroup>
     <ClCompile Include="imgui\misc\cpp\imgui_stdlib.cpp" />
     <ClCompile Include="MenuBar.cpp" />
-    <ClCompile Include="Window.cpp" />
+    <ClCompile Include="FileDisplay.cpp" />
     <ClCompile Include="imgui\backends\imgui_impl_glfw.cpp" />
     <ClCompile Include="imgui\backends\imgui_impl_opengl3.cpp" />
     <ClCompile Include="imgui\imgui.cpp" />
@@ -146,7 +146,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MenuBar.hpp" />
-    <ClInclude Include="Window.hpp" />
+    <ClInclude Include="FileDisplay.hpp" />
     <ClInclude Include="ImGuiInclude.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

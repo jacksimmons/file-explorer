@@ -3,7 +3,7 @@
 
 #include "ImGuiInclude.hpp"
 #include "MenuBar.hpp"
-#include "Window.hpp"
+#include "FileDisplay.hpp"
 
 ImGuiWindowFlags DOCKER_FLAGS =
 ImGuiWindowFlags_NoResize |
@@ -42,6 +42,7 @@ int main(int argc, char **argv)
 
 	double prevUpdate = -INFINITY;
 	double now;
+	UpdateFiles();
 	while (!glfwWindowShouldClose(window))
 	{
 		now = glfwGetTime();
