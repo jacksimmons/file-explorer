@@ -1,0 +1,11 @@
+C:\Git\file-explorer\imgui\misc\cpp\imgui_stdlib.cpp;C:\Git\file-explorer\x64\Debug\imgui_stdlib.obj
+C:\Git\file-explorer\MenuBar.cpp;C:\Git\file-explorer\x64\Debug\MenuBar.obj
+C:\Git\file-explorer\Window.cpp;C:\Git\file-explorer\x64\Debug\Window.obj
+C:\Git\file-explorer\imgui\backends\imgui_impl_glfw.cpp;C:\Git\file-explorer\x64\Debug\imgui_impl_glfw.obj
+C:\Git\file-explorer\imgui\backends\imgui_impl_opengl3.cpp;C:\Git\file-explorer\x64\Debug\imgui_impl_opengl3.obj
+C:\Git\file-explorer\imgui\imgui.cpp;C:\Git\file-explorer\x64\Debug\imgui.obj
+C:\Git\file-explorer\imgui\imgui_demo.cpp;C:\Git\file-explorer\x64\Debug\imgui_demo.obj
+C:\Git\file-explorer\imgui\imgui_draw.cpp;C:\Git\file-explorer\x64\Debug\imgui_draw.obj
+C:\Git\file-explorer\imgui\imgui_tables.cpp;C:\Git\file-explorer\x64\Debug\imgui_tables.obj
+C:\Git\file-explorer\imgui\imgui_widgets.cpp;C:\Git\file-explorer\x64\Debug\imgui_widgets.obj
+C:\Git\file-explorer\main.cpp;C:\Git\file-explorer\x64\Debug\main.obj
