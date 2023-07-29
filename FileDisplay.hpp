@@ -11,6 +11,11 @@
 
 namespace fs = std::filesystem;
 
+const ImGuiTableFlags TABLE_FLAGS =
+ImGuiTableFlags_Resizable |
+ImGuiTableFlags_Reorderable |
+ImGuiTableFlags_Sortable;
+
 class FileDisplay : public Display {
 private:
 	std::vector<std::tuple<std::string, DirectoryAccess>> m_currentDirectories;

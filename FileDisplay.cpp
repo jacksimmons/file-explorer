@@ -22,31 +22,42 @@ bool FileDisplay::Draw(bool update)
 		ImGui::End();
 		return false;
 	}
-	
-	if (ImGui::Button("../"))
-	{
-		m_currentPath = m_currentPath.parent_path();
-		ImGui::End();
-		return true;
-	}
 
-	if (!ImGui::BeginTable("FileDisplayTable", 3))
+	if (!ImGui::BeginTable("FileDisplayTable", 3, TABLE_FLAGS))
 	{
 		ImGui::EndTable();
 		return false;
 	}
 
-	ImGui::TableNextColumn(); ImGui::Text("Name");
-	ImGui::TableNextColumn(); ImGui::Text("File/Directory");
-	ImGui::TableNextColumn(); ImGui::Text("File Size (Bytes)");
+	ImGui::TableSetupColumn("Name");
+	ImGui::TableSetupColumn("File/Directory");
+	ImGui::TableSetupColumn("File Size");
+	ImGui::TableHeadersRow();
+
+	ImGui::TableNextColumn(); bool go_back = ImGui::Button("../");
+	ImGui::TableNextColumn();
+	ImGui::TableNextColumn();
+	ImGuiTableSortSpecs *sortSpecs = ImGui::TableGetSortSpecs();
+
+	if (go_back)
+	{
+		m_currentPath = m_currentPath.parent_path();
+		ImGui::EndTable();
+		ImGui::End();
+		return true;
+	}
 
 	for (auto &directory : m_currentDirectories)
 	{
 		std::string name = std::get<0>(directory);
 		DirectoryAccess access = std::get<1>(directory);
 
-		ImGui::TableNextColumn(); bool button = ImGui::Button((name + "##DIR").c_str());
-		ImGui::TableNextColumn(); ImGui::TextColored(GetTextColourFromAccess(access), "Directory");
+		ImGui::TableNextColumn(); 
+		bool button = ImGui::SmallButton(("cd##" + name).c_str());
+		ImGui::SameLine();
+		ImGui::TextColored(GetTextColourFromAccess(access), name.c_str());
+
+		ImGui::TableNextColumn(); ImGui::Text("Directory");
 		ImGui::TableNextColumn();
 
 		if (button)
