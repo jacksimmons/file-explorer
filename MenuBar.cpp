@@ -1,6 +1,6 @@
 #include "MenuBar.hpp"
 
-void DrawAltMenuBar()
+void MenuBar::Draw()
 {
 	if (ImGui::BeginMainMenuBar())
 	{
@@ -10,6 +10,12 @@ void DrawAltMenuBar()
 		}
 		if (ImGui::BeginMenu("Edit"))
 		{
+			ImGui::EndMenu();
+		}
+		if (ImGui::BeginMenu("View"))
+		{
+			ImGui::MenuItem("File Explorer", "", &m_fileDisplaySelected);
+			ImGui::MenuItem("File Info", "Gives certain details about selected items in the File Explorer.", &m_infoDisplaySelected);
 			ImGui::EndMenu();
 		}
 	}

@@ -1,12 +1,7 @@
-#include <GLFW/glfw3.h>
 #include <filesystem>
 #include <vector>
 #include <iostream>
 #include <stdexcept>
-
-#ifdef _WIN32
-#include "Windows.h"
-#endif
 
 #include "FileDisplay.hpp"
 
@@ -19,7 +14,10 @@ FileDisplay::FileDisplay()
 // Returns whether a post-update is needed
 bool FileDisplay::Draw(bool update)
 {
-	if (!ImGui::Begin("FileDisplay", nullptr, DISP_FLAGS))
+	if (!m_active)
+		return false;
+
+	if (!ImGui::Begin("FileDisplay", &m_active))
 	{
 		ImGui::End();
 		return false;
@@ -27,7 +25,7 @@ bool FileDisplay::Draw(bool update)
 	
 	if (ImGui::Button("../"))
 	{
-		m_currentPath /= "../";
+		m_currentPath = m_currentPath.parent_path();
 		ImGui::End();
 		return true;
 	}
@@ -70,8 +68,8 @@ bool FileDisplay::Draw(bool update)
 		std::string fileSizeDenom = std::get<0>(fileSizeTuple);
 		float fileSizeDenomValue = std::get<1>(fileSizeTuple);
 
-		ImGui::TableNextColumn(); ImGui::Text(name.c_str());
-		ImGui::TableNextColumn(); ImGui::TextColored(GetTextColourFromAccess(access), "File");
+		ImGui::TableNextColumn(); ImGui::TextColored(GetTextColourFromAccess(access), name.c_str());
+		ImGui::TableNextColumn(); ImGui::Text("File");
 		ImGui::TableNextColumn(); ImGui::Text((std::to_string(fileSizeDenomValue) + " " + fileSizeDenom).c_str());
 	}
 
@@ -93,12 +91,22 @@ void FileDisplay::UpdateFiles()
 	m_currentDirectories.clear();
 	m_currentFiles.clear();
 
-	std::cout << m_currentPath << std::endl;
+	fs::directory_iterator iter;
+	try
+	{
+		iter = fs::directory_iterator{ m_currentPath };
+	}
+	catch (fs::filesystem_error e)
+	{
+		m_currentFiles.push_back(std::make_tuple("<Access Denied>", 0, DirectoryAccess_Denied));
+	}
 
-	for (const auto &entry : fs::directory_iterator(m_currentPath))
+	for (const auto &entry : iter)
 	{
 		fs::path path = entry.path();
-		bool is_dir = fs::is_directory(path);
+
+		if (!fs::exists(path))
+			std::cout << "hi" << std::endl;
 
 		std::string fname_str;
 #ifdef _WIN32
@@ -108,77 +116,31 @@ void FileDisplay::UpdateFiles()
 #endif
 
 		bool error = false;
-		if (!is_dir)
+		if (fs::is_regular_file(path))
 		{
 			uintmax_t file_size = 0;
+			DirectoryAccess access;
 			try
 			{
 				file_size = fs::file_size(path);
+				access = DirectoryAccess_Granted;
 			}
 			catch (fs::filesystem_error)
 			{
-				error = true;
+				access = DirectoryAccess_DirNotFound;
 			}
 
-			if (!error)
-			{
-				m_currentFiles.push_back(std::make_tuple(fname_str, file_size, DirectoryAccess_Granted));
-			}
-			else
-			{
-				m_currentFiles.push_back(std::make_tuple(fname_str, file_size, DirectoryAccess_DirNotFound));
-			}
+			m_currentFiles.push_back(std::make_tuple(fname_str, file_size, DirectoryAccess_Granted));
 		}
-		else
+		else if (fs::is_directory(path))
 		{
 			m_currentDirectories.push_back(std::make_tuple(fname_str, DirectoryAccess_Granted));
 		}
+		else
+		{
+			m_currentDirectories.push_back(std::make_tuple(fname_str, DirectoryAccess_Denied));
+		}
 	}
-}
-
-ImVec4 FileDisplay::GetTextColourFromAccess(DirectoryAccess access)
-{
-	ImVec4 colour;
-	switch (access)
-	{
-	case DirectoryAccess_Granted:
-		colour = ACCESS_COLOUR;
-		break;
-	case DirectoryAccess_Denied:
-		colour = NO_ACCESS_COLOUR;
-		break;
-	case DirectoryAccess_DirNotFound:
-		colour = NO_EXIST_COLOUR;
-		break;
-	default:
-		colour = NO_IDEA_COLOUR;
-		break;
-	}
-	return colour;
-}
-
-std::tuple<std::string, float> FileDisplay::GetFileSizeDenom(uintmax_t fileSizeBytes)
-{
-	std::string denoms[] = { "B", "KB", "MB", "GB", "TB" };
-	int denomIndex = 0;
-	float fileSizeDenom = (float)fileSizeBytes;
-	while (fileSizeDenom > 1000 && denomIndex < 4)
-	{
-		fileSizeDenom /= 1000;
-		denomIndex++;
-	}
-
-	std::string denom = denoms[denomIndex];
-	return std::make_tuple(denom, fileSizeDenom);
-}
-
-// From: https://stackoverflow.com/questions/215963/how-do-you-properly-use-widechartomultibyte
-std::string FileDisplay::utf8_encode(const std::wstring &wstring)
-{
-	int size = WideCharToMultiByte(CP_UTF8, 0, &wstring[0], (int)wstring.size(), NULL, 0, NULL, NULL);
-	std::string string(size, 0);
-	WideCharToMultiByte(CP_UTF8, 0, &wstring[0], (int)wstring.size(), &string[0], size, NULL, NULL);
-	return string;
 }
 
 fs::path FileDisplay::currentPath()

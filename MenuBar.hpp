@@ -1,3 +1,9 @@
-#include "ImGuiInclude.hpp"
+#include "imgui.h"
 
-void DrawAltMenuBar();
+class MenuBar {
+public:
+	bool m_fileDisplaySelected = false;
+	bool m_infoDisplaySelected = false;
+
+	void Draw();
+};

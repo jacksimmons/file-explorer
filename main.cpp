@@ -7,15 +7,11 @@
 #include "FileDisplay.hpp"
 #include "InfoDisplay.hpp"
 
-ImGuiWindowFlags DOCKER_FLAGS =
+ImGuiWindowFlags MAIN_FLAGS =
 ImGuiWindowFlags_NoResize |
 ImGuiWindowFlags_NoCollapse |
 ImGuiWindowFlags_NoTitleBar |
 ImGuiWindowFlags_MenuBar;
-
-ImGuiWindowFlags MAIN_FLAGS =
-DOCKER_FLAGS |
-ImGuiWindowFlags_NoDocking;
 
 int main(int argc, char **argv)
 {
@@ -43,14 +39,12 @@ int main(int argc, char **argv)
 
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
+	MenuBar menuBar;
+	FileDisplay fileDisplay;
+	InfoDisplay infoDisplay;
 
-	double prevUpdate = -INFINITY;
+	double prevFileSystemUpdate = -INFINITY;
 	double now;
-
-	auto fileDisplay = std::make_unique<FileDisplay>();
-	auto infoDisplay = std::make_unique<InfoDisplay>();
-	fileDisplay->UpdateFiles();
-
 	bool update = false;
 	while (!glfwWindowShouldClose(window))
 	{
@@ -62,31 +56,34 @@ int main(int argc, char **argv)
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		ImGui::SetNextWindowPos(ImVec2(0, 0));
-		ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, io.DisplaySize.y));
-		ImGui::Begin("(Invis)", nullptr, MAIN_FLAGS);
-
-		DrawAltMenuBar();
-
-		// Docker window
+		if (menuBar.m_fileDisplaySelected)
 		{
-			ImGui::SetNextWindowPos(ImVec2(0, 20));
-			ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, io.DisplaySize.y));
-			ImGui::Begin("Docker", nullptr, DOCKER_FLAGS);
+			fileDisplay.setActive(true);
+			menuBar.m_fileDisplaySelected = false;
+		}
+		if (menuBar.m_infoDisplaySelected)
+		{
+			infoDisplay.setActive(true);
+			menuBar.m_infoDisplaySelected = false;
+		}
 
-			if (now - prevUpdate > 1)
-			{
-				update = fileDisplay->Draw(true);
-				infoDisplay->Draw(true, fileDisplay->currentPath(), fileDisplay->selectedFile());
-				prevUpdate = now;
-			}
-			else
-			{
-				update = fileDisplay->Draw(update);
-				infoDisplay->Draw(update);
-			}
+		ImGui::SetNextWindowPos(ImVec2(0, 20));
+		ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x, io.DisplaySize.y));
+		ImGui::Begin("Main", nullptr, MAIN_FLAGS);
 
-			ImGui::End();
+		menuBar.Draw();
+
+		// File/Info displays, updated every second
+		if (now - prevFileSystemUpdate > 1)
+		{
+			update = fileDisplay.Draw(true);
+			infoDisplay.Draw(true, fileDisplay.currentPath(), fileDisplay.selectedFile());
+			prevFileSystemUpdate = now;
+		}
+		else
+		{
+			update = fileDisplay.Draw(update);
+			infoDisplay.Draw(update);
 		}
 
 		ImGui::End();

@@ -1,8 +1,7 @@
-#include <iostream>
-
 #include "magic_enum.hpp"
 
-#include "ImGuiInclude.hpp"
+#include <iostream>
+
 #include "InfoDisplay.hpp"
 
 InfoDisplay::InfoDisplay()
@@ -13,15 +12,21 @@ InfoDisplay::InfoDisplay()
 void InfoDisplay::init()
 {
 	m_name = "(Unselected)";
-	m_type = fs::file_type::not_found;
+	m_type = fs::file_type::unknown;
 	m_perms = fs::perms::unknown;
 	m_space_info = fs::space_info();
+	m_space_info.capacity = 0;
+	m_space_info.available = 0;
+	m_space_info.free = 0;
 	m_size = 0;
 }
 
 void InfoDisplay::Draw(bool update, fs::path path, std::string file)
 {
-	if (!ImGui::Begin("InfoDisplay", nullptr, DISP_FLAGS))
+	if (!m_active)
+		return;
+
+	if (!ImGui::Begin("InfoDisplay", &m_active))
 	{
 		ImGui::End();
 		return;
@@ -33,6 +38,8 @@ void InfoDisplay::Draw(bool update, fs::path path, std::string file)
 		return;
 	}
 
+	bool space_info_known = true;
+	bool size_known = true;
 	if (update)
 	{
 		if (file != "")
@@ -46,12 +53,25 @@ void InfoDisplay::Draw(bool update, fs::path path, std::string file)
 		}
 		else
 		{
-			m_name = path.filename().string();
-			fs::file_status status = fs::status(path);
-			m_type = status.type();
-			m_perms = status.permissions();
-			m_space_info = fs::space(path);
-			m_size = fs::file_size(path);
+			try { m_name = path.filename().string(); }
+			catch (fs::filesystem_error) { m_name = "<Access Denied>"; }
+
+			try { 
+				fs::file_status status;
+				status = fs::status(path);
+				m_type = status.type();
+				m_perms = status.permissions();
+			}
+			catch (fs::filesystem_error) {
+				m_type = fs::file_type::unknown;
+				m_perms = fs::perms::unknown;
+			}
+
+			try { m_space_info = fs::space(path); }
+			catch (fs::filesystem_error) { space_info_known = false; }
+
+			try { m_size = fs::file_size(path); }
+			catch (fs::filesystem_error) { size_known = false; }
 		}
 	}
 
@@ -69,19 +89,82 @@ void InfoDisplay::Draw(bool update, fs::path path, std::string file)
 	std::string owner_write = (fs::perms::none == (m_perms & fs::perms::owner_write) ? "-" : "w");
 	std::string owner_exec = (fs::perms::none == (m_perms & fs::perms::owner_exec) ? "-" : "x");
 	ImGui::TableNextColumn(); ImGui::Text("Owner Permissions");
-	ImGui::TableNextColumn(); ImGui::Text((owner_read + owner_write + owner_exec).c_str());
+	ImGui::TableNextColumn();
+	if (m_perms != fs::perms::unknown)
+		ImGui::Text((owner_read + owner_write + owner_exec).c_str());
+	else
+		ImGui::Text("Unknown");
 
 	std::string group_read = (fs::perms::none == (m_perms & fs::perms::group_read) ? "-" : "r");
 	std::string group_write = (fs::perms::none == (m_perms & fs::perms::group_write) ? "-" : "w");
 	std::string group_exec = (fs::perms::none == (m_perms & fs::perms::group_exec) ? "-" : "x");
 	ImGui::TableNextColumn(); ImGui::Text("Group Permissions");
-	ImGui::TableNextColumn(); ImGui::Text((group_read + group_write + group_exec).c_str());
+	ImGui::TableNextColumn();
+	if (m_perms != fs::perms::unknown)
+		ImGui::Text((group_read + group_write + group_exec).c_str());
+	else
+		ImGui::Text("Unknown");
 
 	std::string others_read = (fs::perms::none == (m_perms & fs::perms::others_read) ? "-" : "r");
 	std::string others_write = (fs::perms::none == (m_perms & fs::perms::others_write) ? "-" : "w");
 	std::string others_exec = (fs::perms::none == (m_perms & fs::perms::others_exec) ? "-" : "x");
 	ImGui::TableNextColumn(); ImGui::Text("Other Permissions");
-	ImGui::TableNextColumn(); ImGui::Text((others_read + others_write + others_exec).c_str());
+	ImGui::TableNextColumn();
+	if (m_perms != fs::perms::unknown)
+		ImGui::Text((others_read + others_write + others_exec).c_str());
+	else
+		ImGui::Text("Unknown");
+
+
+	if (!space_info_known)
+	{
+		ImGui::TableNextColumn(); ImGui::Text("Disk: Capacity");
+		ImGui::TableNextColumn(); ImGui::Text("Unknown");
+
+		ImGui::TableNextColumn(); ImGui::Text("Disk: Available");
+		ImGui::TableNextColumn(); ImGui::Text("Unknown");
+
+		ImGui::TableNextColumn(); ImGui::Text("Disk: Free");
+		ImGui::TableNextColumn(); ImGui::Text("Unknown");
+	}
+	else
+	{
+		std::tuple<std::string, float> denomTuple = GetFileSizeDenom(m_space_info.capacity);
+		std::string denom = std::get<0>(denomTuple);
+		float denomValue = std::get<1>(denomTuple);
+		ImGui::TableNextColumn(); ImGui::Text("Disk: Capacity");
+		ImGui::TableNextColumn(); ImGui::Text((std::to_string(denomValue) + denom).c_str());
+
+		denomTuple = GetFileSizeDenom(m_space_info.available);
+		denom = std::get<0>(denomTuple);
+		denomValue = std::get<1>(denomTuple);
+		ImGui::TableNextColumn(); ImGui::Text("Disk: Available");
+		ImGui::TableNextColumn(); ImGui::Text((std::to_string(denomValue) + denom).c_str());
+
+		denomTuple = GetFileSizeDenom(m_space_info.free);
+		denom = std::get<0>(denomTuple);
+		denomValue = std::get<1>(denomTuple);
+		ImGui::TableNextColumn(); ImGui::Text("Disk: Free");
+		ImGui::TableNextColumn(); ImGui::Text((std::to_string(denomValue) + denom).c_str());
+	}
+
+	if (!size_known)
+	{
+		ImGui::TableNextColumn(); ImGui::Text("Size");
+		ImGui::TableNextColumn(); ImGui::Text("Unknown");
+	}
+	else
+	{
+		std::tuple<std::string, float> denomTuple;
+		std::string denom;
+		float denomValue;
+
+		denomTuple = GetFileSizeDenom(m_size);
+		denom = std::get<0>(denomTuple);
+		denomValue = std::get<1>(denomTuple);
+		ImGui::TableNextColumn(); ImGui::Text("Size");
+		ImGui::TableNextColumn(); ImGui::Text((std::to_string(denomValue) + denom).c_str());
+	}
 
 	ImGui::EndTable();
 
