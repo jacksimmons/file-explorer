@@ -5,13 +5,13 @@ ImVec4 GetTextColourFromAccess(DirectoryAccess access)
 	ImVec4 colour;
 	switch (access)
 	{
-	case DirectoryAccess_Granted:
+	case DirectoryAccess::Granted:
 		colour = ACCESS_COLOUR;
 		break;
-	case DirectoryAccess_Denied:
+	case DirectoryAccess::Denied:
 		colour = NO_ACCESS_COLOUR;
 		break;
-	case DirectoryAccess_DirNotFound:
+	case DirectoryAccess::NotFound:
 		colour = NO_EXIST_COLOUR;
 		break;
 	default:

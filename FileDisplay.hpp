@@ -1,6 +1,7 @@
 #pragma once
 
 #include "imgui.h"
+#include "magic_enum.hpp"
 
 #include <vector>
 #include <tuple>
@@ -8,6 +9,8 @@
 #include <filesystem>
 
 #include "Display.hpp"
+
+#define ACCESS_DENIED "<Access Denied>"
 
 namespace fs = std::filesystem;
 

@@ -8,14 +8,19 @@
 #include <Windows.h>
 #endif
 
-enum DirectoryAccess
+enum class DirectoryAccess
 {
-	DirectoryAccess_Granted,
-	DirectoryAccess_Denied,
-	DirectoryAccess_DirNotFound
+	Granted,
+	Denied,
+	NotFound
 };
 
-// Access-based colours
+// Colours
+constexpr ImVec4 DIR_COLOUR =
+ImVec4(0, 255, 255, 1);
+constexpr ImVec4 FILE_COLOUR =
+ImVec4(255, 255, 255, 1);
+
 constexpr ImVec4 ACCESS_COLOUR =
 ImVec4(255, 255, 255, 1);
 constexpr ImVec4 NO_ACCESS_COLOUR =

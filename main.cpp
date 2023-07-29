@@ -43,7 +43,8 @@ int main(int argc, char **argv)
 	FileDisplay fileDisplay;
 	InfoDisplay infoDisplay;
 
-	double prevFileSystemUpdate = -INFINITY;
+	double prevFileDispUpdate = -INFINITY;
+	double prevInfoDispUpdate = -INFINITY;
 	double now;
 	bool update = false;
 	while (!glfwWindowShouldClose(window))
@@ -74,16 +75,27 @@ int main(int argc, char **argv)
 		menuBar.Draw();
 
 		// File/Info displays, updated every second
-		if (now - prevFileSystemUpdate > 1)
+		if (update)
 		{
 			update = fileDisplay.Draw(true);
 			infoDisplay.Draw(true, fileDisplay.currentPath(), fileDisplay.selectedFile());
-			prevFileSystemUpdate = now;
+		}
+		else if (now - prevInfoDispUpdate > 0.1)
+		{
+			update = fileDisplay.Draw(false);
+			infoDisplay.Draw(true, fileDisplay.currentPath(), fileDisplay.selectedFile());
+			prevInfoDispUpdate = now;
+		}
+		else if (now - prevFileDispUpdate > 1)
+		{
+			update = fileDisplay.Draw(true);
+			infoDisplay.Draw(false);
+			prevFileDispUpdate = now;
 		}
 		else
 		{
-			update = fileDisplay.Draw(update);
-			infoDisplay.Draw(update);
+			update = fileDisplay.Draw(false);
+			infoDisplay.Draw(false, fileDisplay.currentPath(), fileDisplay.selectedFile());
 		}
 
 		ImGui::End();

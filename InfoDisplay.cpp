@@ -19,6 +19,9 @@ void InfoDisplay::init()
 	m_space_info.available = 0;
 	m_space_info.free = 0;
 	m_size = 0;
+
+	m_size_known = true;
+	m_space_info_known = true;
 }
 
 void InfoDisplay::Draw(bool update, fs::path path, std::string file)
@@ -38,8 +41,6 @@ void InfoDisplay::Draw(bool update, fs::path path, std::string file)
 		return;
 	}
 
-	bool space_info_known = true;
-	bool size_known = true;
 	if (update)
 	{
 		if (file != "")
@@ -67,11 +68,17 @@ void InfoDisplay::Draw(bool update, fs::path path, std::string file)
 				m_perms = fs::perms::unknown;
 			}
 
-			try { m_space_info = fs::space(path); }
-			catch (fs::filesystem_error) { space_info_known = false; }
+			try { 
+				m_space_info = fs::space(path);
+				m_space_info_known = true;
+			}
+			catch (fs::filesystem_error) { m_space_info_known = false; }
 
-			try { m_size = fs::file_size(path); }
-			catch (fs::filesystem_error) { size_known = false; }
+			try { 
+				m_size = fs::file_size(path);
+				m_size_known = true;
+			}
+			catch (fs::filesystem_error) { m_size_known = false; }
 		}
 	}
 
@@ -82,8 +89,23 @@ void InfoDisplay::Draw(bool update, fs::path path, std::string file)
 	ImGui::TableNextColumn(); ImGui::Text("Type");
 	ImGui::TableNextColumn(); ImGui::Text(type);
 
-	ImGui::TableNextColumn(); ImGui::Text("Size");
-	ImGui::TableNextColumn(); ImGui::Text(std::to_string(m_size).c_str());
+	if (!m_size_known)
+	{
+		ImGui::TableNextColumn(); ImGui::Text("Size");
+		ImGui::TableNextColumn(); ImGui::Text("Unknown");
+	}
+	else
+	{
+		std::tuple<std::string, float> denomTuple;
+		std::string denom;
+		float denomValue;
+
+		denomTuple = GetFileSizeDenom(m_size);
+		denom = std::get<0>(denomTuple);
+		denomValue = std::get<1>(denomTuple);
+		ImGui::TableNextColumn(); ImGui::Text("Size");
+		ImGui::TableNextColumn(); ImGui::Text((std::to_string(denomValue) + denom).c_str());
+	}
 
 	std::string owner_read = (fs::perms::none == (m_perms & fs::perms::owner_read) ? "-" : "r");
 	std::string owner_write = (fs::perms::none == (m_perms & fs::perms::owner_write) ? "-" : "w");
@@ -115,8 +137,7 @@ void InfoDisplay::Draw(bool update, fs::path path, std::string file)
 	else
 		ImGui::Text("Unknown");
 
-
-	if (!space_info_known)
+	if (!m_space_info_known)
 	{
 		ImGui::TableNextColumn(); ImGui::Text("Disk: Capacity");
 		ImGui::TableNextColumn(); ImGui::Text("Unknown");
@@ -145,24 +166,6 @@ void InfoDisplay::Draw(bool update, fs::path path, std::string file)
 		denom = std::get<0>(denomTuple);
 		denomValue = std::get<1>(denomTuple);
 		ImGui::TableNextColumn(); ImGui::Text("Disk: Free");
-		ImGui::TableNextColumn(); ImGui::Text((std::to_string(denomValue) + denom).c_str());
-	}
-
-	if (!size_known)
-	{
-		ImGui::TableNextColumn(); ImGui::Text("Size");
-		ImGui::TableNextColumn(); ImGui::Text("Unknown");
-	}
-	else
-	{
-		std::tuple<std::string, float> denomTuple;
-		std::string denom;
-		float denomValue;
-
-		denomTuple = GetFileSizeDenom(m_size);
-		denom = std::get<0>(denomTuple);
-		denomValue = std::get<1>(denomTuple);
-		ImGui::TableNextColumn(); ImGui::Text("Size");
 		ImGui::TableNextColumn(); ImGui::Text((std::to_string(denomValue) + denom).c_str());
 	}
 

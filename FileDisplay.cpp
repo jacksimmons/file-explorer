@@ -23,24 +23,26 @@ bool FileDisplay::Draw(bool update)
 		return false;
 	}
 
+	ImGui::TextColored(FILE_COLOUR, (utf8_encode(m_currentPath.c_str()) + "\\" + m_selectedFile).c_str());
+
 	if (!ImGui::BeginTable("FileDisplayTable", 3, TABLE_FLAGS))
 	{
 		ImGui::EndTable();
 		return false;
 	}
 
+	ImGui::TableSetupColumn("Type");
 	ImGui::TableSetupColumn("Name");
-	ImGui::TableSetupColumn("File/Directory");
 	ImGui::TableSetupColumn("File Size");
 	ImGui::TableHeadersRow();
 
+	ImGui::TableNextColumn();
 	ImGui::TableNextColumn(); bool go_back = ImGui::Button("../");
 	ImGui::TableNextColumn();
-	ImGui::TableNextColumn();
-	ImGuiTableSortSpecs *sortSpecs = ImGui::TableGetSortSpecs();
 
 	if (go_back)
 	{
+		m_selectedFile = "";
 		m_currentPath = m_currentPath.parent_path();
 		ImGui::EndTable();
 		ImGui::End();
@@ -52,16 +54,14 @@ bool FileDisplay::Draw(bool update)
 		std::string name = std::get<0>(directory);
 		DirectoryAccess access = std::get<1>(directory);
 
-		ImGui::TableNextColumn(); 
-		bool button = ImGui::SmallButton(("cd##" + name).c_str());
-		ImGui::SameLine();
-		ImGui::TextColored(GetTextColourFromAccess(access), name.c_str());
-
-		ImGui::TableNextColumn(); ImGui::Text("Directory");
+		bool selected = false;
+		ImGui::TableNextColumn(); ImGui::PushStyleColor(ImGuiCol_Text, DIR_COLOUR); ImGui::Text("Directory"); ImGui::PopStyleColor();
+		ImGui::TableNextColumn(); ImGui::PushStyleColor(ImGuiCol_Text, GetTextColourFromAccess(access)); selected = ImGui::Selectable((name + "##DIR").c_str()); ImGui::PopStyleColor();
 		ImGui::TableNextColumn();
 
-		if (button)
+		if (selected)
 		{
+			m_selectedFile = "";
 			m_currentPath /= name;
 			ImGui::EndTable();
 			ImGui::End();
@@ -79,9 +79,22 @@ bool FileDisplay::Draw(bool update)
 		std::string fileSizeDenom = std::get<0>(fileSizeTuple);
 		float fileSizeDenomValue = std::get<1>(fileSizeTuple);
 
-		ImGui::TableNextColumn(); ImGui::TextColored(GetTextColourFromAccess(access), name.c_str());
-		ImGui::TableNextColumn(); ImGui::Text("File");
+		bool selected = false;
+		ImGui::TableNextColumn();
+
+		// All Access Denied entities are put into the files vector, we must handle them here.
+		if (name == ACCESS_DENIED)
+			ImGui::TextColored(NO_ACCESS_COLOUR, "???");
+		else
+			ImGui::TextColored(FILE_COLOUR, "File");
+
+		ImGui::TableNextColumn(); ImGui::PushStyleColor(ImGuiCol_Text, GetTextColourFromAccess(access)); selected = ImGui::Selectable((name + "##FILE").c_str(), selected); ImGui::PopStyleColor();
 		ImGui::TableNextColumn(); ImGui::Text((std::to_string(fileSizeDenomValue) + " " + fileSizeDenom).c_str());
+
+		if (selected)
+		{
+			m_selectedFile = name;
+		}
 	}
 
 	// Updates the directory every second in case new files are created.
@@ -109,7 +122,7 @@ void FileDisplay::UpdateFiles()
 	}
 	catch (fs::filesystem_error e)
 	{
-		m_currentFiles.push_back(std::make_tuple("<Access Denied>", 0, DirectoryAccess_Denied));
+		m_currentFiles.push_back(std::make_tuple(ACCESS_DENIED, 0, DirectoryAccess::Denied));
 	}
 
 	for (const auto &entry : iter)
@@ -134,22 +147,22 @@ void FileDisplay::UpdateFiles()
 			try
 			{
 				file_size = fs::file_size(path);
-				access = DirectoryAccess_Granted;
+				access = DirectoryAccess::Granted;
 			}
 			catch (fs::filesystem_error)
 			{
-				access = DirectoryAccess_DirNotFound;
+				access = DirectoryAccess::NotFound;
 			}
 
-			m_currentFiles.push_back(std::make_tuple(fname_str, file_size, DirectoryAccess_Granted));
+			m_currentFiles.push_back(std::make_tuple(fname_str, file_size, DirectoryAccess::Granted));
 		}
 		else if (fs::is_directory(path))
 		{
-			m_currentDirectories.push_back(std::make_tuple(fname_str, DirectoryAccess_Granted));
+			m_currentDirectories.push_back(std::make_tuple(fname_str, DirectoryAccess::Granted));
 		}
 		else
 		{
-			m_currentDirectories.push_back(std::make_tuple(fname_str, DirectoryAccess_Denied));
+			m_currentDirectories.push_back(std::make_tuple(fname_str, DirectoryAccess::Denied));
 		}
 	}
 }

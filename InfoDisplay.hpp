@@ -16,6 +16,8 @@ private:
 	fs::perms m_perms;
 	fs::space_info m_space_info;
 	uintmax_t m_size;
+	bool m_size_known;
+	bool m_space_info_known;
 	//fs::file_time_type m_last_modified;
 public:
 	InfoDisplay();
