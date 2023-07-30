@@ -29,7 +29,7 @@ void InfoDisplay::Draw(bool update, fs::path path, std::string file)
 	if (!m_active)
 		return;
 
-	if (!ImGui::Begin("InfoDisplay", &m_active))
+	if (!ImGui::Begin("File Info", &m_active))
 	{
 		ImGui::End();
 		return;

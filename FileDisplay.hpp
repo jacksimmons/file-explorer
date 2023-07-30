@@ -12,7 +12,10 @@
 
 #define ACCESS_DENIED "<Access Denied>"
 
-namespace fs = std::filesystem;
+constexpr ImVec4 DIR_COLOUR =
+ImVec4(0, 255, 255, 1);
+constexpr ImVec4 FILE_COLOUR =
+ImVec4(255, 255, 255, 1);
 
 const ImGuiTableFlags TABLE_FLAGS =
 ImGuiTableFlags_Resizable |

@@ -2,8 +2,9 @@
 
 class MenuBar {
 public:
-	bool m_fileDisplaySelected = false;
-	bool m_infoDisplaySelected = false;
+	bool m_fileExplorerSelected = false;
+	bool m_fileInfoSelected = false;
+	bool m_fileViewerSelected = false;
 
 	void Draw();
 };

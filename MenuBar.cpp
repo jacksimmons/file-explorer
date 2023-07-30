@@ -14,8 +14,9 @@ void MenuBar::Draw()
 		}
 		if (ImGui::BeginMenu("View"))
 		{
-			ImGui::MenuItem("File Explorer", "", &m_fileDisplaySelected);
-			ImGui::MenuItem("File Info", "Gives certain details about selected items in the File Explorer.", &m_infoDisplaySelected);
+			ImGui::MenuItem("File Explorer", "", &m_fileExplorerSelected);
+			ImGui::MenuItem("File Info", "Gives certain details about selected items in the File Explorer.", &m_fileInfoSelected);
+			ImGui::MenuItem("File Viewer", "Reads files as text.", &m_fileViewerSelected);
 			ImGui::EndMenu();
 		}
 	}
