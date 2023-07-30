@@ -7,8 +7,6 @@
 #include "Display.hpp"
 #include "FileDisplay.hpp"
 
-namespace fs = std::filesystem;
-
 class InfoDisplay : public Display {
 private:
 	std::string m_name;

@@ -3,10 +3,13 @@
 #include "imgui.h"
 #include <tuple>
 #include <string>
+#include <filesystem>
 
 #ifdef _WIN32
 #include <Windows.h>
 #endif
+
+namespace fs = std::filesystem;
 
 enum class DirectoryAccess
 {
@@ -16,11 +19,6 @@ enum class DirectoryAccess
 };
 
 // Colours
-constexpr ImVec4 DIR_COLOUR =
-ImVec4(0, 255, 255, 1);
-constexpr ImVec4 FILE_COLOUR =
-ImVec4(255, 255, 255, 1);
-
 constexpr ImVec4 ACCESS_COLOUR =
 ImVec4(255, 255, 255, 1);
 constexpr ImVec4 NO_ACCESS_COLOUR =

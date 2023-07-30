@@ -17,7 +17,7 @@ bool FileDisplay::Draw(bool update)
 	if (!m_active)
 		return false;
 
-	if (!ImGui::Begin("FileDisplay", &m_active))
+	if (!ImGui::Begin("File Explorer", &m_active))
 	{
 		ImGui::End();
 		return false;

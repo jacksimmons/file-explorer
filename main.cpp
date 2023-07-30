@@ -6,6 +6,7 @@
 #include "MenuBar.hpp"
 #include "FileDisplay.hpp"
 #include "InfoDisplay.hpp"
+#include "ViewerDisplay.hpp"
 
 ImGuiWindowFlags MAIN_FLAGS =
 ImGuiWindowFlags_NoResize |
@@ -42,11 +43,12 @@ int main(int argc, char **argv)
 	MenuBar menuBar;
 	FileDisplay fileDisplay;
 	InfoDisplay infoDisplay;
+	ViewerDisplay viewerDisplay;
 
 	double prevFileDispUpdate = -INFINITY;
 	double prevInfoDispUpdate = -INFINITY;
 	double now;
-	bool update = false;
+	bool updateFileSystem = false;
 	while (!glfwWindowShouldClose(window))
 	{
 		now = glfwGetTime();
@@ -57,15 +59,20 @@ int main(int argc, char **argv)
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		if (menuBar.m_fileDisplaySelected)
+		if (menuBar.m_fileExplorerSelected)
 		{
 			fileDisplay.setActive(true);
-			menuBar.m_fileDisplaySelected = false;
+			menuBar.m_fileExplorerSelected = false;
 		}
-		if (menuBar.m_infoDisplaySelected)
+		if (menuBar.m_fileInfoSelected)
 		{
 			infoDisplay.setActive(true);
-			menuBar.m_infoDisplaySelected = false;
+			menuBar.m_fileInfoSelected = false;
+		}
+		if (menuBar.m_fileViewerSelected)
+		{
+			viewerDisplay.setActive(true);
+			menuBar.m_fileViewerSelected = false;
 		}
 
 		ImGui::SetNextWindowPos(ImVec2(0, 20));
@@ -74,28 +81,39 @@ int main(int argc, char **argv)
 
 		menuBar.Draw();
 
-		// File/Info displays, updated every second
-		if (update)
+		fs::path currentPath = fileDisplay.currentPath();
+		std::string selectedFile = fileDisplay.selectedFile();
+		// Menus which are updated at fixed intervals, or when updateFileSystem == true.
+		if (updateFileSystem)
 		{
-			update = fileDisplay.Draw(true);
-			infoDisplay.Draw(true, fileDisplay.currentPath(), fileDisplay.selectedFile());
+			updateFileSystem = fileDisplay.Draw(true);
+			infoDisplay.Draw(true, currentPath, selectedFile);
 		}
 		else if (now - prevInfoDispUpdate > 0.1)
 		{
-			update = fileDisplay.Draw(false);
-			infoDisplay.Draw(true, fileDisplay.currentPath(), fileDisplay.selectedFile());
+			updateFileSystem = fileDisplay.Draw(false);
+			infoDisplay.Draw(true, currentPath, selectedFile);
 			prevInfoDispUpdate = now;
 		}
 		else if (now - prevFileDispUpdate > 1)
 		{
-			update = fileDisplay.Draw(true);
+			updateFileSystem = fileDisplay.Draw(true);
 			infoDisplay.Draw(false);
 			prevFileDispUpdate = now;
 		}
 		else
 		{
-			update = fileDisplay.Draw(false);
-			infoDisplay.Draw(false, fileDisplay.currentPath(), fileDisplay.selectedFile());
+			updateFileSystem = fileDisplay.Draw(false);
+			infoDisplay.Draw(false);
+		}
+
+		if (fileDisplay.currentPath() != "" && fileDisplay.selectedFile() != "")
+		{
+			viewerDisplay.Draw(viewerDisplay.currentFilePath() != (currentPath / selectedFile), currentPath, selectedFile);
+		}
+		else
+		{
+			viewerDisplay.Draw(false);
 		}
 
 		ImGui::End();
