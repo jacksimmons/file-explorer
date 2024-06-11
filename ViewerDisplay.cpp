@@ -47,7 +47,6 @@ void ViewerDisplay::UpdateFile(fs::path path, std::string file)
 	m_lines.clear();
 	std::fstream f;
 	f.open(filePath.string(), std::ios::in);
-	std::cout << filePath << std::endl;
 
 	int line_no = 0;
 	if (f.is_open())

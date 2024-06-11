@@ -129,9 +129,6 @@ void FileDisplay::UpdateFiles()
 	{
 		fs::path path = entry.path();
 
-		if (!fs::exists(path))
-			std::cout << "hi" << std::endl;
-
 		std::string fname_str;
 #ifdef _WIN32
 		fname_str = utf8_encode(path.filename());
