@@ -149,6 +149,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Display.hpp" />
+    <ClInclude Include="main.hpp" />
     <ClInclude Include="ViewerDisplay.hpp" />
     <ClInclude Include="InfoDisplay.hpp" />
     <ClInclude Include="MenuBar.hpp" />

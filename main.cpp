@@ -1,8 +1,9 @@
-#include <GLFW/glfw3.h>
 #include <iostream>
 #include <memory>
 
 #include "ImGuiInclude.hpp"
+
+#include "main.hpp"
 #include "MenuBar.hpp"
 #include "FileDisplay.hpp"
 #include "InfoDisplay.hpp"
@@ -16,6 +17,7 @@ ImGuiWindowFlags_MenuBar;
 
 int main(int argc, char **argv)
 {
+	// GLFW setup
 	if (!glfwInit())
 		return -1;
 
@@ -26,6 +28,7 @@ int main(int argc, char **argv)
 	glfwMakeContextCurrent(window);
 	glfwSwapInterval(1);
 
+	// Dear ImGui setup
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO &io = ImGui::GetIO();
@@ -35,10 +38,12 @@ int main(int argc, char **argv)
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init();
 
+	// Vanity setup
 	ImGui::StyleColorsDark();
 
-
-	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+	// Constants
+	const float UPDATE_INTERVAL_FILE_DISP = 1.0f;
+	const float UPDATE_INTERVAL_INFO_DISP = 0.1f;
 
 	MenuBar menuBar;
 	FileDisplay fileDisplay;
@@ -49,15 +54,15 @@ int main(int argc, char **argv)
 	double prevInfoDispUpdate = -INFINITY;
 	double now;
 	bool updateFileSystem = false;
+
+	// Loop: Poll -> NewFrame -> (Draw Code) -> Render
 	while (!glfwWindowShouldClose(window))
 	{
-		now = glfwGetTime();
 		glfwPollEvents();
 
-		// feed inputs to dear imgui, start new frame
-		ImGui_ImplOpenGL3_NewFrame();
-		ImGui_ImplGlfw_NewFrame();
-		ImGui::NewFrame();
+		NewFrame();
+
+		now = glfwGetTime();
 
 		if (menuBar.m_fileExplorerSelected)
 		{
@@ -83,53 +88,65 @@ int main(int argc, char **argv)
 
 		fs::path currentPath = fileDisplay.currentPath();
 		std::string selectedFile = fileDisplay.selectedFile();
-		// Menus which are updated at fixed intervals, or when updateFileSystem == true.
-		if (updateFileSystem)
-		{
-			updateFileSystem = fileDisplay.Draw(true);
-			infoDisplay.Draw(true, currentPath, selectedFile);
-		}
-		else if (now - prevInfoDispUpdate > 0.1)
-		{
-			updateFileSystem = fileDisplay.Draw(false);
-			infoDisplay.Draw(true, currentPath, selectedFile);
-			prevInfoDispUpdate = now;
-		}
-		else if (now - prevFileDispUpdate > 1)
-		{
-			updateFileSystem = fileDisplay.Draw(true);
-			infoDisplay.Draw(false);
-			prevFileDispUpdate = now;
-		}
-		else
-		{
-			updateFileSystem = fileDisplay.Draw(false);
-			infoDisplay.Draw(false);
-		}
-
-		if (fileDisplay.currentPath() != "" && fileDisplay.selectedFile() != "")
-		{
-			viewerDisplay.Draw(viewerDisplay.currentFilePath() != (currentPath / selectedFile), currentPath, selectedFile);
-		}
-		else
-		{
-			viewerDisplay.Draw(false);
-		}
+		
+		// Menus which are updated at fixed intervals, or when updateFileSystem == true
+		updateFileSystem = fileDisplay.Draw(now - prevFileDispUpdate > 1 || updateFileSystem);
+		infoDisplay.Draw(
+			now - prevInfoDispUpdate > 0.1 || updateFileSystem,
+			currentPath,
+			selectedFile
+		);
+		viewerDisplay.Draw(
+			fileDisplay.currentPath() != "" && fileDisplay.selectedFile() != "" || updateFileSystem,
+			currentPath,
+			selectedFile
+		);
 
 		ImGui::End();
-		ImGui::Render();
 
-		int display_w, display_h;
-		glfwGetFramebufferSize(window, &display_w, &display_h);
-		
-		glViewport(0, 0, display_w, display_h);
-		glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
-		glClear(GL_COLOR_BUFFER_BIT);
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		// 
+		if (now - prevFileDispUpdate > UPDATE_INTERVAL_FILE_DISP)
+		{
+			prevFileDispUpdate = now;
+		}
 
-		glfwSwapBuffers(window);
+		if (now - prevInfoDispUpdate > UPDATE_INTERVAL_INFO_DISP)
+		{
+			prevInfoDispUpdate = now;
+		}
+
+		Render(window);
 	}
 
+	Teardown();
+}
+
+void NewFrame()
+{
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+}
+
+void Render(GLFWwindow *window)
+{
+	constexpr ImVec4 COL_CLEAR = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+	ImGui::Render();
+
+	int display_w, display_h;
+	glfwGetFramebufferSize(window, &display_w, &display_h);
+
+	glViewport(0, 0, display_w, display_h);
+	glClearColor(COL_CLEAR.x * COL_CLEAR.w, COL_CLEAR.y * COL_CLEAR.w, COL_CLEAR.z * COL_CLEAR.w, COL_CLEAR.w);
+	glClear(GL_COLOR_BUFFER_BIT);
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+	glfwSwapBuffers(window);
+}
+
+void Teardown()
+{
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();

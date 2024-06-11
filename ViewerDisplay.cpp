@@ -25,7 +25,7 @@ void ViewerDisplay::Draw(bool update, fs::path path, std::string file)
 
 	if (m_currentFilePath != "")
 	{
-		ImGui::TextColored(ACCESS_COLOUR, utf8_encode(m_currentFilePath).c_str());
+		ImGui::TextColored(TEXT_COLOUR, utf8_encode(m_currentFilePath).c_str());
 	}
 
 	for (int i = 0; i < m_lines.size(); i++)
@@ -62,7 +62,8 @@ void ViewerDisplay::UpdateFile(fs::path path, std::string file)
 	}
 	else
 	{
-		ImGui::TextColored(NO_ACCESS_COLOUR, "Unable to read file.");
+		ImGui::TextColored(TEXT_COLOUR, utf8_encode(filePath).c_str());
+		ImGui::TextColored(NO_ACCESS_COLOUR, "Insufficient permissions to read file.");
 		m_currentFilePath = "";
 	}
 }
