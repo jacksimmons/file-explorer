@@ -1,0 +1,14 @@
+C:\Git\file-explorer\Display.cpp;C:\Git\file-explorer\FileExplorer\x64\Debug\Display.obj
+C:\Git\file-explorer\ViewerDisplay.cpp;C:\Git\file-explorer\FileExplorer\x64\Debug\ViewerDisplay.obj
+C:\Git\file-explorer\include\imgui\backends\imgui_impl_glfw.cpp;C:\Git\file-explorer\FileExplorer\x64\Debug\imgui_impl_glfw.obj
+C:\Git\file-explorer\include\imgui\backends\imgui_impl_opengl3.cpp;C:\Git\file-explorer\FileExplorer\x64\Debug\imgui_impl_opengl3.obj
+C:\Git\file-explorer\include\imgui\imgui.cpp;C:\Git\file-explorer\FileExplorer\x64\Debug\imgui.obj
+C:\Git\file-explorer\include\imgui\imgui_demo.cpp;C:\Git\file-explorer\FileExplorer\x64\Debug\imgui_demo.obj
+C:\Git\file-explorer\include\imgui\imgui_draw.cpp;C:\Git\file-explorer\FileExplorer\x64\Debug\imgui_draw.obj
+C:\Git\file-explorer\include\imgui\imgui_tables.cpp;C:\Git\file-explorer\FileExplorer\x64\Debug\imgui_tables.obj
+C:\Git\file-explorer\include\imgui\imgui_widgets.cpp;C:\Git\file-explorer\FileExplorer\x64\Debug\imgui_widgets.obj
+C:\Git\file-explorer\include\imgui\misc\cpp\imgui_stdlib.cpp;C:\Git\file-explorer\FileExplorer\x64\Debug\imgui_stdlib.obj
+C:\Git\file-explorer\InfoDisplay.cpp;C:\Git\file-explorer\FileExplorer\x64\Debug\InfoDisplay.obj
+C:\Git\file-explorer\MenuBar.cpp;C:\Git\file-explorer\FileExplorer\x64\Debug\MenuBar.obj
+C:\Git\file-explorer\FileDisplay.cpp;C:\Git\file-explorer\FileExplorer\x64\Debug\FileDisplay.obj
+C:\Git\file-explorer\main.cpp;C:\Git\file-explorer\FileExplorer\x64\Debug\main.obj
