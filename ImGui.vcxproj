@@ -134,7 +134,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Display.cpp" />
-    <ClCompile Include="ViewerDisplay.cpp" />
+    <ClCompile Include="FileViewerDisplay.cpp" />
     <ClCompile Include="include\imgui\backends\imgui_impl_glfw.cpp" />
     <ClCompile Include="include\imgui\backends\imgui_impl_opengl3.cpp" />
     <ClCompile Include="include\imgui\imgui.cpp" />
@@ -143,18 +143,18 @@
     <ClCompile Include="include\imgui\imgui_tables.cpp" />
     <ClCompile Include="include\imgui\imgui_widgets.cpp" />
     <ClCompile Include="include\imgui\misc\cpp\imgui_stdlib.cpp" />
-    <ClCompile Include="InfoDisplay.cpp" />
+    <ClCompile Include="FileInfoDisplay.cpp" />
     <ClCompile Include="MenuBar.cpp" />
-    <ClCompile Include="FileDisplay.cpp" />
+    <ClCompile Include="FileExplorerDisplay.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Display.hpp" />
     <ClInclude Include="main.hpp" />
-    <ClInclude Include="ViewerDisplay.hpp" />
-    <ClInclude Include="InfoDisplay.hpp" />
+    <ClInclude Include="FileViewerDisplay.hpp" />
+    <ClInclude Include="FileInfoDisplay.hpp" />
     <ClInclude Include="MenuBar.hpp" />
-    <ClInclude Include="FileDisplay.hpp" />
+    <ClInclude Include="FileExplorerDisplay.hpp" />
     <ClInclude Include="ImGuiInclude.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

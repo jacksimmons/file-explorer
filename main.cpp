@@ -5,9 +5,9 @@
 
 #include "main.hpp"
 #include "MenuBar.hpp"
-#include "FileDisplay.hpp"
-#include "InfoDisplay.hpp"
-#include "ViewerDisplay.hpp"
+#include "FileExplorerDisplay.hpp"
+#include "FileInfoDisplay.hpp"
+#include "FileViewerDisplay.hpp"
 
 ImGuiWindowFlags MAIN_FLAGS =
 ImGuiWindowFlags_NoResize |
@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 	if (!glfwInit())
 		return -1;
 
-	GLFWwindow *window = glfwCreateWindow(1280, 720, "Test", nullptr, nullptr);
+	GLFWwindow *window = glfwCreateWindow(1280, 720, "File Explorer", nullptr, nullptr);
 	if (window == nullptr)
 		return -1;
 
@@ -46,8 +46,8 @@ int main(int argc, char **argv)
 	const float UPDATE_INTERVAL_INFO_DISP = 0.1f;
 
 	MenuBar menuBar;
-	FileDisplay fileDisplay;
-	InfoDisplay infoDisplay;
+	FileExplorerDisplay fileDisplay;
+	FileInfoDisplay infoDisplay;
 	ViewerDisplay viewerDisplay;
 
 	double prevFileDispUpdate = -INFINITY;

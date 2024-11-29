@@ -1,4 +1,2 @@
-﻿  FileDisplay.cpp
-  ViewerDisplay.cpp
-  Generating Code...
+﻿  FileExplorerDisplay.cpp
   ImGui.vcxproj -> C:\Git\file-explorer\x64\Debug\FileExplorer.exe
