@@ -1,7 +1,7 @@
 [submodule "imgui-docking"]
-	path = imgui-docking
+	path = external/imgui
 	url = https://github.com/ocornut/imgui
 	branch = docking
-[submodule "magic_enum"]
-	path = magic_enum
-	url = https://github.com/Neargye/magic_enum
+[submodule "GLFW"]
+	path = external/GLFW
+	url = https://github.com/glfw/glfw
