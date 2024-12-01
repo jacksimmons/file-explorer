@@ -4,7 +4,8 @@ Release/
 Debug/
 x64/
 x32/
-
+FileExplorer*/
+out/
 CMakeLists.txt.user
 CMakeCache.txt
 CMakeFiles
