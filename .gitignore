@@ -6,6 +6,7 @@ x64/
 x32/
 FileExplorer*/
 out/
+
 CMakeLists.txt.user
 CMakeCache.txt
 CMakeFiles
@@ -18,3 +19,7 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 CMakeUserPresets.json
+
+*.vcxproj
+*.vcxproj.filters
+*.sln
