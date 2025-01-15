@@ -1,5 +1,5 @@
 # Setup (GLFW and ImGui)
-This repo uses submodules - use 'git clone --recurse-submodules'.
+This repo uses submodules - please use '--recurse-submodules' when using Git.
 
 # Building (Requires CMake)
 `cmake . `  
